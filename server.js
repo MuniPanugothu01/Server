@@ -31,14 +31,12 @@ const allowedOrigins = [
 
 app.post("/stripe", express.raw({ type: "application/json" }), stripWebhooks);
 
-app.use(cors({ origin: allowedOrigins, credentials: true }));
-
+app.use(cors({ origin: '*', credentials: true }));
+app.use(express.json());
 app.use(cookieParser());
 
 // Middleware configuration
-// app.use(express.json());
-// app.use(cookieParser());
-// app.use(cors({ origin: allowedOrigins, credentials: true }));
+
 
 app.get("/", (req, res) => {
   res.send("api is working");
