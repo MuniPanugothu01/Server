@@ -24,14 +24,21 @@ connectCloudinary();
 
 //cors is used to connect the frontend to backend
 // allow multiple origins
-const allowedOrigins = ["http://localhost:5173","https://freshcart-three-eta.vercel.app/"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://freshcart-three-eta.vercel.app",
+];
 
 app.post("/stripe", express.raw({ type: "application/json" }), stripWebhooks);
 
-// Middleware configuration
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+
+// Middleware configuration
+// app.use(express.json());
+// app.use(cookieParser());
+// app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 app.get("/", (req, res) => {
   res.send("api is working");
