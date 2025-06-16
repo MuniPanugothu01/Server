@@ -4,7 +4,7 @@ const { Address } = require("../models/Address.js");
 const addAddress = async (req, res) => {
   try {
     const {
-      userId,
+      // userId,
       firstName,
       lastName,
       email,
@@ -15,6 +15,9 @@ const addAddress = async (req, res) => {
       country,
       phone,
     } = req.body;
+
+    // ✅ Use the userId from the authenticated request
+    const userId = req.userId;
 
     await Address.create({
       userId,
@@ -39,7 +42,8 @@ const addAddress = async (req, res) => {
 // get address : /api/address/get
 const getAddress = async (req, res) => {
   try {
-    const { userId } = req.query;
+    // const { userId } = req.query;
+    const userId = req.userId; // ✅ coming from authUser middleware
     const addresses = await Address.find({ userId });
     res.json({ success: true, addresses });
   } catch (error) {
