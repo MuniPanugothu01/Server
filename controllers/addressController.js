@@ -44,7 +44,7 @@ const getAddress = async (req, res) => {
   try {
     // const { userId } = req.query;
     const userId = req.userId;
-    const addresses = await Address.find({ userId });
+    const addresses = await Address.find({ userId }); 
     res.json({ success: true, addresses });
   } catch (error) {
     console.log(error.message);
