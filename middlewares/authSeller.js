@@ -42,7 +42,7 @@ const authSeller = async (req, res, next) => {
 
     req.seller = seller; // ✅ set for later use
     next();
-  } catch (error) {
+  } catch (error) { 
     res.status(401).json({ success: false, message: "Unauthorized" });
   }
 };
