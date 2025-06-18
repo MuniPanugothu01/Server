@@ -6,42 +6,6 @@ dotenv.config();
 const User = require("../models/User.js");
 
 // Place Order (COD)
-// const placrOrderCOD = async (req, res) => {
-//   try {
-//     const { userId, items, address } = req.body;
-
-//     if (!address || items.length === 0) {
-//       return res.json({ success: false, message: "Invalid Data!" });
-//     }
-
-//     // Calculate total amount
-//     let amount = 0;
-//     for (const item of items) {
-//       const product = await Product.findById(item.product);
-//       if (!product) {
-//         return res.json({ success: false, message: "Product not found!" });
-//       }
-//       amount += product.offerPrice * item.quantity;
-//     }
-
-//     // Add 2% tax
-//     amount += Math.floor(amount * 0.02);
-
-//     await Order.create({
-//       userId,
-//       items,
-//       amount,
-//       address,
-//       paymentType: "COD",
-//     });
-
-//     res.json({ success: true, message: "Order Placed Successfully!" });
-//   } catch (error) {
-//     console.log(error.message);
-//     res.json({ success: false, message: error.message });
-//   }
-// };
-
 const placrOrderCOD = async (req, res) => {
   try {
     const { userId, items, address } = req.body;
@@ -50,30 +14,22 @@ const placrOrderCOD = async (req, res) => {
       return res.json({ success: false, message: "Invalid Data!" });
     }
 
+    // Calculate total amount
     let amount = 0;
-    const updatedItems = [];
-
     for (const item of items) {
       const product = await Product.findById(item.product);
       if (!product) {
         return res.json({ success: false, message: "Product not found!" });
       }
-
-      // Add seller info to item
-      updatedItems.push({
-        product: item.product,
-        quantity: item.quantity,
-        seller: product.seller,
-      });
-
       amount += product.offerPrice * item.quantity;
     }
 
-    amount += Math.floor(amount * 0.02); // tax
+    // Add 2% tax
+    amount += Math.floor(amount * 0.02);
 
     await Order.create({
       userId,
-      items: updatedItems,
+      items,
       amount,
       address,
       paymentType: "COD",
@@ -87,80 +43,6 @@ const placrOrderCOD = async (req, res) => {
 };
 
 // place order Stripe: /api/order/stripe
-// const placeOrderStripe = async (req, res) => {
-//   try {
-//     const { userId, items, address } = req.body;
-//     const { origin } = req.headers;
-
-//     if (!address || items.length === 0) {
-//       return res.json({ success: 400, message: "Invalid Data!" });
-//     }
-
-//     let productData = [];
-
-//     // Calculate total amount
-//     let amount = 0;
-//     for (const item of items) {
-//       const product = await Product.findById(item.product);
-//       productData.push({
-//         name: product.name,
-//         price: product.offerPrice,
-//         quantity: item.quantity,
-//       });
-//       if (!product) {
-//         return res.json({ success: false, message: "Product not found!" });
-//       }
-//       amount += product.offerPrice * item.quantity;
-//     }
-
-//     // Add 2% tax
-//     amount += Math.floor(amount * 0.02);
-
-//     const order = await Order.create({
-//       userId,
-//       items,
-//       amount,
-//       address,
-//       paymentType: "Online",
-//     });
-
-//     // Stipe GateWay Initialize
-
-//     const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
-
-//     // create line items for stripe
-//     const line_items = productData.map((item) => {
-//       return {
-//         price_data: {
-//           currency: "EUR",
-//           product_data: {
-//             name: item.name,
-//           },
-//           unit_amount: Math.floor(item.price + item.price * 0.02) * 100,
-//         },
-//         quantity: item.quantity,
-//       };
-//     });
-//     // Create session
-
-//     const session = await stripeInstance.checkout.sessions.create({
-//       line_items,
-//       mode: "payment",
-//       success_url: `${origin}/loader?next=my-orders`,
-//       cancel_url: `${origin}/cart`,
-//       metadata: {
-//         orderId: order._id.toString(),
-//         userId,
-//       },
-//     });
-
-//     res.json({ success: true, url: session.url });
-//   } catch (error) {
-//     console.log(error.message);
-//     res.json({ success: false, message: error.message });
-//   }
-// };
-
 const placeOrderStripe = async (req, res) => {
   try {
     const { userId, items, address } = req.body;
@@ -170,51 +52,52 @@ const placeOrderStripe = async (req, res) => {
       return res.json({ success: 400, message: "Invalid Data!" });
     }
 
-    const productData = [];
-    const updatedItems = [];
-    let amount = 0;
+    let productData = [];
 
+    // Calculate total amount
+    let amount = 0;
     for (const item of items) {
       const product = await Product.findById(item.product);
-      if (!product) {
-        return res.json({ success: false, message: "Product not found!" });
-      }
-
       productData.push({
         name: product.name,
         price: product.offerPrice,
         quantity: item.quantity,
       });
-
-      updatedItems.push({
-        product: item.product,
-        quantity: item.quantity,
-        seller: product.seller,
-      });
-
+      if (!product) {
+        return res.json({ success: false, message: "Product not found!" });
+      }
       amount += product.offerPrice * item.quantity;
     }
 
-    amount += Math.floor(amount * 0.02); // tax
+    // Add 2% tax
+    amount += Math.floor(amount * 0.02);
 
     const order = await Order.create({
       userId,
-      items: updatedItems,
+      items,
       amount,
       address,
       paymentType: "Online",
     });
 
+    // Stipe GateWay Initialize
+
     const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
 
-    const line_items = productData.map((item) => ({
-      price_data: {
-        currency: "EUR",
-        product_data: { name: item.name },
-        unit_amount: Math.floor(item.price + item.price * 0.02) * 100,
-      },
-      quantity: item.quantity,
-    }));
+    // create line items for stripe
+    const line_items = productData.map((item) => {
+      return {
+        price_data: {
+          currency: "EUR",
+          product_data: {
+            name: item.name,
+          },
+          unit_amount: Math.floor(item.price + item.price * 0.02) * 100,
+        },
+        quantity: item.quantity,
+      };
+    });
+    // Create session
 
     const session = await stripeInstance.checkout.sessions.create({
       line_items,
