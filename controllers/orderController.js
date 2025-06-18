@@ -193,22 +193,6 @@ const getUserOrders = async (req, res) => {
   }
 };
 
-// Get all orders (admin/seller)
-// const getAllOrders = async (req, res) => {
-//   try {
-//     const orders = await Order.find({
-//       $or: [{ paymentType: "COD" }, { isPaid: true }],
-//     })
-//       .populate("items.product")
-//       .populate("address");
-
-//     res.json({ success: true, orders });
-//   } catch (error) {
-//     console.log(error.message);
-//     res.json({ success: false, message: error.message });
-//   }
-// };
-
 const getAllOrders = async (req, res) => {
   try {
     const sellerId = req.seller._id; // ✅ authSeller middleware must set req.seller
