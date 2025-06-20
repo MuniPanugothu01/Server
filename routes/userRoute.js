@@ -13,5 +13,5 @@ userRouter.post("/login", login);
 userRouter.get("/is-auth", authUser, isAuth);
 userRouter.get("/logout", logout);
 module.exports = {
-  userRouter,
+   userRouter
 };

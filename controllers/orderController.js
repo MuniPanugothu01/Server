@@ -3,7 +3,7 @@ const { Order } = require("../models/Order.js");
 const stripe = require("stripe");
 const dotenv = require("dotenv");
 dotenv.config();
-const User = require("../models/User.js");
+const User = require("../models/User.js");  
 
 // Place Order (COD)
 const placrOrderCOD = async (req, res) => {
