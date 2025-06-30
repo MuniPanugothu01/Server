@@ -17,7 +17,10 @@ const addAddress = async (req, res) => {
     } = req.body;
 
     // ✅ Use the userId from the authenticated request
-    const userId = req.userId;
+
+    // const userId = req.userId;
+
+    const userId = req.user.id;
 
     await Address.create({
       userId,
@@ -43,8 +46,11 @@ const addAddress = async (req, res) => {
 const getAddress = async (req, res) => {
   try {
     // const { userId } = req.query;
-    const userId = req.userId;
-    const addresses = await Address.find({ userId }); 
+    // const userId = req.userId;
+
+    const userId = req.user.id; // ✅ Corrected this line
+
+    const addresses = await Address.find({ userId });
     res.json({ success: true, addresses });
   } catch (error) {
     console.log(error.message);
