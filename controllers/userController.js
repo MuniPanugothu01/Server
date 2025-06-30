@@ -86,7 +86,7 @@ const login = async (req, res) => {
     res.json({ success: false, message: err.message });
   }
 };
-
+  
 // Check if user is authenticated : /api/user/is-auth
 const isAuth = async (req, res) => {
   try {

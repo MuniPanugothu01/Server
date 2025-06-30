@@ -33,9 +33,9 @@ const authUser = async (req, res, next) => {
   }
 
   try {
-    const tokenDecode = jwt.verify(token, process.env.JWT_SECRET);
-    if (tokenDecode.id) {
-      req.user = { id: tokenDecode.id };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded.id) {
+      req.user = { id: decoded.id }; // This is where `userId` comes from
       next();
     } else {
       return res.json({ success: false, message: "Invalid Token" });
